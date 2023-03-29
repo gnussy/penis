@@ -1,7 +1,7 @@
 <h1 align="center"> PENIS 🍆 </h1>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/gnussy/penis/main/assets/logo.png" width=300 />
+  <img src="https://raw.githubusercontent.com/gnussy/penis/main/assets/logo.png" width=200 />
 </p>
 <p align="center">
   <i>Portable Efficient Navigation Interface System</i>
