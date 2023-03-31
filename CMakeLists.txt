@@ -14,9 +14,6 @@ set_target_properties(penis-lib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOU
 target_include_directories(penis-lib PRIVATE
     include
 )
-target_include_directories(penis-lib PRIVATE
-    /home/danielboll/.xmake/packages/g/gtest/1.12.1/77b9096bc4b34d9282f672d36b015ba9/include
-)
 target_compile_options(penis-lib PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-m64>
     $<$<COMPILE_LANGUAGE:CXX>:-m64>
@@ -38,70 +35,10 @@ if(MSVC)
     set_property(TARGET penis-lib PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-target_link_libraries(penis-lib PRIVATE
-    gtest_main
-    gmock
-    gtest
-    pthread
-)
-target_link_directories(penis-lib PRIVATE
-    /home/danielboll/.xmake/packages/g/gtest/1.12.1/77b9096bc4b34d9282f672d36b015ba9/lib
-)
 target_link_options(penis-lib PRIVATE
     -m64
 )
 target_sources(penis-lib PRIVATE
     src/penis/penis.cpp
-)
-
-# target
-add_executable(test "")
-set_target_properties(test PROPERTIES OUTPUT_NAME "test")
-set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/x86_64/release")
-add_dependencies(test penis-lib)
-target_include_directories(test PRIVATE
-    include
-)
-target_include_directories(test PRIVATE
-    /home/danielboll/.xmake/packages/g/gtest/1.12.1/77b9096bc4b34d9282f672d36b015ba9/include
-)
-target_compile_options(test PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-m64>
-    $<$<COMPILE_LANGUAGE:CXX>:-m64>
-    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
-    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
-)
-set_target_properties(test PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_features(test PRIVATE cxx_std_20)
-if(MSVC)
-    target_compile_options(test PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
-else()
-    target_compile_options(test PRIVATE -O3)
-endif()
-if(MSVC)
-else()
-    target_compile_options(test PRIVATE -fvisibility=hidden)
-endif()
-if(MSVC)
-    set_property(TARGET test PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-target_link_libraries(test PRIVATE
-    gtest_main
-    gmock
-    gtest
-    penis-lib
-    pthread
-)
-target_link_directories(test PRIVATE
-    /home/danielboll/.xmake/packages/g/gtest/1.12.1/77b9096bc4b34d9282f672d36b015ba9/lib
-    build/linux/x86_64/release
-)
-target_link_options(test PRIVATE
-    -m64
-)
-target_sources(test PRIVATE
-    test/main.cpp
-    test/playground.cpp
 )
 
