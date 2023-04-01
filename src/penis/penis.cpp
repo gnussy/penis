@@ -18,7 +18,7 @@ namespace penis {
 
   PromptBuilder::Self PromptBuilder::run() {
     while (true) {
-      std::cout << "> ";
+      std::cout << prompt_;
       std::string input = read_line();
       if (input.empty()) {
         continue;
@@ -38,6 +38,11 @@ namespace penis {
 
   PromptBuilder::Self PromptBuilder::subscribe(PromptBuilder::CommandCallback callback) {
     command_callbacks_.push_back(callback);
+    return this;
+  }
+
+  PromptBuilder::Self PromptBuilder::prompt(const std::string_view& prompt) {
+    this->prompt_ = prompt;
     return this;
   }
 
@@ -71,10 +76,10 @@ namespace penis {
               history_pos_--;
               line = history_[history_pos_];
               pos = line.size();
-              std::cout << "> ";
+              std::cout << prompt_;
               std::cout << line;
             } else {
-              std::cout << "> ";
+              std::cout << prompt_;
             }
             break;
           case 'B':                   // Down arrow
@@ -83,10 +88,10 @@ namespace penis {
               history_pos_++;
               line = history_[history_pos_];
               pos = line.size();
-              std::cout << "> ";
+              std::cout << prompt_;
               std::cout << line;
             } else {
-              std::cout << "> ";
+              std::cout << prompt_;
             }
             break;
           case 'C':  // Right arrow

@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 
 namespace penis {
   class PromptBuilder {
@@ -17,12 +18,14 @@ namespace penis {
     std::vector<CommandCallback> command_callbacks_;
     std::vector<std::string> history_;
     int history_pos_;
+    std::string_view prompt_;
 
   public:
     PromptBuilder();
 
-    Self run();
     Self subscribe(CommandCallback callback);
+    Self prompt(const std::string_view& prompt);
+    Self run();
 
     ~PromptBuilder();
 
