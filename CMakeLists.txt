@@ -5,7 +5,7 @@
 # project
 cmake_minimum_required(VERSION 3.15.0)
 cmake_policy(SET CMP0091 NEW)
-project(penis VERSION 1.0.0 LANGUAGES CXX C)
+project(penis VERSION 1.1.0 LANGUAGES CXX C)
 
 # target
 add_library(penis-lib STATIC "")
@@ -40,5 +40,47 @@ target_link_options(penis-lib PRIVATE
 )
 target_sources(penis-lib PRIVATE
     src/penis/penis.cpp
+)
+
+# target
+add_executable(penis-lib-test "")
+set_target_properties(penis-lib-test PROPERTIES OUTPUT_NAME "penis-lib-test")
+set_target_properties(penis-lib-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/x86_64/release")
+add_dependencies(penis-lib-test penis-lib)
+target_include_directories(penis-lib-test PRIVATE
+    include
+)
+target_compile_options(penis-lib-test PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-m64>
+    $<$<COMPILE_LANGUAGE:CXX>:-m64>
+    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
+    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
+)
+set_target_properties(penis-lib-test PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(penis-lib-test PRIVATE cxx_std_20)
+if(MSVC)
+    target_compile_options(penis-lib-test PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
+else()
+    target_compile_options(penis-lib-test PRIVATE -O3)
+endif()
+if(MSVC)
+else()
+    target_compile_options(penis-lib-test PRIVATE -fvisibility=hidden)
+endif()
+if(MSVC)
+    set_property(TARGET penis-lib-test PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(penis-lib-test PRIVATE
+    penis-lib
+)
+target_link_directories(penis-lib-test PRIVATE
+    build/linux/x86_64/release
+)
+target_link_options(penis-lib-test PRIVATE
+    -m64
+)
+target_sources(penis-lib-test PRIVATE
+    example/simple.cpp
 )
 
