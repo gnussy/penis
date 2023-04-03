@@ -1,5 +1,5 @@
 set_project("penis")
-set_version("1.1.0")
+set_version("2.0.0")
 set_xmakever("2.7.0")
 
 set_languages("c++20")
@@ -31,7 +31,6 @@ for _, file in ipairs(get_files_in_directory(example_dir)) do
     set_default(false)
     set_kind("binary")
     add_files(file)
-    add_packages(table.unpack(libs))
     add_deps("penis-lib")
 end
 

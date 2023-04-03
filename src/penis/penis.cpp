@@ -5,7 +5,7 @@ namespace penis {
 
   PromptBuilder::PromptBuilder() {
     // Save the current terminal settings
-    tcgetattr(STDIN_FILENO, &termios_settings_);
+    tcgetattr(STDIN_FILENO, &termios_settings);
 
     // Set the terminal to non-canonical mode without echoing
     set_terminal_mode(false);
@@ -17,6 +17,19 @@ namespace penis {
   }
 
   PromptBuilder::Self PromptBuilder::run() {
+    std::thread event_thread([this] {
+      while (!stop_event_listener) {
+        std::unique_lock<std::mutex> lock(event_mutex);
+        event_cond.wait(lock, [this] { return stop_event_listener || !event_queue.empty(); });
+        if (stop_event_listener) break;
+        const auto& event = event_queue.front();
+        for (const auto& callback : event_callbacks) {
+          callback(event.first + " " + event.second);
+        }
+        event_queue.pop();
+      }
+    });
+
     while (true) {
       std::cout << prompt_;
       std::string input = read_line();
@@ -26,18 +39,34 @@ namespace penis {
       if (input == "quit" || input == "exit") {
         break;
       }
-      history_.push_back(input);
-      history_pos_ = history_.size();
-      for (const auto& callback : command_callbacks_) {
+      history.push_back(input);
+      history_pos = history.size();
+      for (const auto& callback : command_callbacks) {
         callback(input);
       }
     }
 
+    stop_event_listener = true;
+    event_cond.notify_one();
+    event_thread.join();
     return this;
   }
 
-  PromptBuilder::Self PromptBuilder::subscribe(PromptBuilder::CommandCallback callback) {
-    command_callbacks_.push_back(callback);
+  PromptBuilder::Self PromptBuilder::subscribe_command(PromptBuilder::CommandCallback callback) {
+    command_callbacks.push_back(callback);
+    return this;
+  }
+
+  PromptBuilder::Self PromptBuilder::subscribe_event(PromptBuilder::CommandCallback callback) {
+    event_callbacks.push_back(callback);
+    return this;
+  }
+
+  PromptBuilder::Self PromptBuilder::emit_event(const std::string& event_type,
+                                                const std::string& event_data) {
+    std::lock_guard<std::mutex> lock(event_mutex);
+    event_queue.push({event_type, event_data});
+    event_cond.notify_one();
     return this;
   }
 
@@ -48,11 +77,11 @@ namespace penis {
 
   void PromptBuilder::set_terminal_mode(bool on) {
     if (on) {
-      tcsetattr(STDIN_FILENO, TCSANOW, &termios_settings_);
+      tcsetattr(STDIN_FILENO, TCSANOW, &termios_settings);
       return;
     }
 
-    termios new_settings = termios_settings_;
+    termios new_settings = termios_settings;
     new_settings.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &new_settings);
   }
@@ -72,9 +101,9 @@ namespace penis {
         switch (getchar()) {
           case 'A':                   // Up arrow
             std::cout << "\r\x1B[K";  // clear line
-            if (!history_.empty() && history_pos_ > 0) {
-              history_pos_--;
-              line = history_[history_pos_];
+            if (!history.empty() && history_pos > 0) {
+              history_pos--;
+              line = history[history_pos];
               pos = line.size();
               std::cout << prompt_;
               std::cout << line;
@@ -84,9 +113,9 @@ namespace penis {
             break;
           case 'B':                   // Down arrow
             std::cout << "\r\x1B[K";  // clear line
-            if (history_pos_ < history_.size() - 1) {
-              history_pos_++;
-              line = history_[history_pos_];
+            if (history_pos < history.size() - 1) {
+              history_pos++;
+              line = history[history_pos];
               pos = line.size();
               std::cout << prompt_;
               std::cout << line;

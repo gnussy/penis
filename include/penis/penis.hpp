@@ -3,9 +3,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <condition_variable>
 #include <functional>
+#include <mutex>
+#include <queue>
 #include <string>
 #include <string_view>
+#include <thread>
 
 namespace penis {
   class PromptBuilder {
@@ -14,16 +18,24 @@ namespace penis {
     using Self = PromptBuilder*;
 
   private:
-    termios termios_settings_;
-    std::vector<CommandCallback> command_callbacks_;
-    std::vector<std::string> history_;
-    int history_pos_;
+    termios termios_settings;
+    std::vector<CommandCallback> command_callbacks;
+    std::vector<CommandCallback> event_callbacks;
+    std::vector<std::string> history;
+    int history_pos;
     std::string_view prompt_;
+
+    std::mutex event_mutex;
+    std::condition_variable event_cond;
+    std::queue<std::pair<std::string, std::string>> event_queue;
+    std::atomic<bool> stop_event_listener = false;
 
   public:
     PromptBuilder();
 
-    Self subscribe(CommandCallback callback);
+    Self subscribe_command(CommandCallback callback);
+    Self subscribe_event(CommandCallback callback);
+    Self emit_event(const std::string& event_type, const std::string& event_data);
     Self prompt(const std::string_view& prompt);
     Self run();
 

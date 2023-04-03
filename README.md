@@ -11,7 +11,7 @@
 
 # Introduction
 
-PENI is a C++ library that provides a subscription-based API to allow clients to access commands from a prompt. The library is a wrapper around the <termios.h> library, which controls keys, maintains a history, and provides auto-complete functionality to the user.
+PENIS is a C++ library that provides a subscription-based API to allow clients to access commands from a prompt. The library is a wrapper around the <termios.h> library, which controls keys, maintains a history, and provides auto-complete functionality to the user.
 
 # Features
 
@@ -32,10 +32,10 @@ PENI is a C++ library that provides a subscription-based API to allow clients to
 - [ ] Describe usage
 
 # Examples
-Here's an example of how to use the PENI library to create a simple calculator:
+Here's an example of how to use the PENIS library to create a simple calculator:
 
 ```c++
-#include <penis.hpp>
+#include <penis/penis.hpp>
 #include <iostream>
 
 void my_callback(const std::string& command) {
@@ -43,14 +43,13 @@ void my_callback(const std::string& command) {
 }
 
 int main() {
-  PromptBuilder repl;
-  repl.subscribe(my_callback);
-  repl.run();
+  penis::PromptBuilder repl;
+  repl.subscribe_command(my_callback).run();
   return 0;
 }
 ```
 
-This example creates a subscription to the PENI prompt and waits for the user to input a command. If the command is "exit", the program will exit. Otherwise, it tries to convert the command string to an integer and prints the result to the console. If the conversion fails, it prints an error message.
+This example creates a subscription to the PENIS prompt and waits for the user to input a command. If the command is "exit", the program will exit. Otherwise, it tries to convert the command string to an integer and prints the result to the console. If the conversion fails, it prints an error message.
 
 # License
 PENIS is licensed under the GPL-3 License. See the LICENSE file for more information.

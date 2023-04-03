@@ -5,11 +5,11 @@ int main(void) {
   penis::PromptBuilder builder;
 
   builder.prompt("$> ")
-      ->subscribe([&builder](const std::string &command) {
-        if (command == "prompt") {
-          builder.prompt("$/sub> ");
-        }
+      ->subscribe_command([&builder](const std::string &command) {
+        if (command == "prompt") builder.prompt("$/sub> ");
+        if (command == "event") builder.emit_event("sugma", "dick");
       })
+      ->subscribe_event([](const std::string &command) { std::cout << command << std::endl; })
       ->run();
   return 0;
 }
