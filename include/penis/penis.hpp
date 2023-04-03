@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <atomic>
 
 namespace penis {
   class PromptBuilder {
