@@ -22,9 +22,12 @@ namespace penis {
         std::unique_lock<std::mutex> lock(event_mutex);
         event_cond.wait(lock, [this] { return stop_event_listener || !event_queue.empty(); });
         if (stop_event_listener) break;
-        const auto& event = event_queue.front();
+        const auto& [event_name, event_data] = event_queue.front();
+
+        if (event_name == "change_prompt") this->prompt(event_data);
+
         for (const auto& callback : event_callbacks) {
-          callback(event.first + " " + event.second);
+          callback(event_name + " " + event_data);
         }
         event_queue.pop();
       }
