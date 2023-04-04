@@ -24,7 +24,7 @@ namespace penis {
     std::vector<CommandCallback> event_callbacks;
     std::vector<std::string> history;
     int history_pos;
-    std::string_view prompt_;
+    std::string prompt_;
 
     std::mutex event_mutex;
     std::condition_variable event_cond;
@@ -37,7 +37,7 @@ namespace penis {
     Self subscribe_command(CommandCallback callback);
     Self subscribe_event(CommandCallback callback);
     Self emit_event(const std::string& event_type, const std::string& event_data);
-    Self prompt(const std::string_view& prompt);
+    Self prompt(const std::string& prompt);
     Self run();
 
     ~PromptBuilder();

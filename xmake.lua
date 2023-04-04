@@ -1,5 +1,5 @@
 set_project("penis")
-set_version("2.1.0")
+set_version("2.1.1")
 set_xmakever("2.7.0")
 
 set_languages("c++20")

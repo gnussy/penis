@@ -22,12 +22,16 @@ namespace penis {
         std::unique_lock<std::mutex> lock(event_mutex);
         event_cond.wait(lock, [this] { return stop_event_listener || !event_queue.empty(); });
         if (stop_event_listener) break;
-        const auto& [event_name, event_data] = event_queue.front();
+        const auto& event = event_queue.front();
 
-        if (event_name == "change_prompt") this->prompt(event_data);
+        if (event.first == "change_prompt") {
+          this->prompt(event.second);
+          event_queue.pop();
+          continue;
+        }
 
         for (const auto& callback : event_callbacks) {
-          callback(event_name + " " + event_data);
+          callback(event.first + " " + event.second);
         }
         event_queue.pop();
       }
@@ -73,7 +77,7 @@ namespace penis {
     return this;
   }
 
-  PromptBuilder::Self PromptBuilder::prompt(const std::string_view& prompt) {
+  PromptBuilder::Self PromptBuilder::prompt(const std::string& prompt) {
     this->prompt_ = prompt;
     return this;
   }
